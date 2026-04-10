@@ -38,7 +38,7 @@ pipeline {
             steps {
                 echo 'Запуск тестов с генерацией JUnit XML......'
                 sh '''
-                    . venv/bin/activateS
+                    . venv/bin/activate
                     pip install unittest-xml-reporting
                     python -m xmlrunner discover -o test-results -v
                 '''
