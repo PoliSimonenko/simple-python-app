@@ -36,10 +36,11 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                echo 'Запуск тестов...'
+                echo 'Запуск тестов с генерацией JUnit XML......'
                 sh '''
-                    . venv/bin/activate
-                    python -m unittest test_app.py -v
+                    . venv/bin/activateS
+                    pip install unittest-xml-reporting
+                    python -m xmlrunner discover -o test-results -v
                 '''
             }
             post {
@@ -47,7 +48,11 @@ pipeline {
                 failure { echo '❌ Тесты упали!' }
             }
         }
-
+	stage('Publish Test Results') {
+            steps {
+                junit 'test-results/*.xml'
+            }
+        }
         stage('Build Docker Image') {
             steps {
                 echo 'Сборка Docker образа...'
@@ -88,28 +93,6 @@ pipeline {
                 }
             }
         }
-	stage('Run Tests') {
-            steps {
-                echo 'Запуск тестов с генерацией JUnit XML...'
-                sh '''
-                    . venv/bin/activate
-            	    pip install unittest-xml-reporting
-                    python -m xmlrunner discover -o test-results -v
-                '''
-    }
-            post {
-                success { echo '✅ Все тесты пройдены!' }
-                failure { echo '❌ Тесты упали!' }
-            }
-        }
-
-
-        stage('Publish Test Results') {
-            steps {
-                junit 'test-results/*.xml'
-            }
-        }
-
     }
 
     post {
