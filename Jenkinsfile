@@ -88,6 +88,28 @@ pipeline {
                 }
             }
         }
+	stage('Run Tests') {
+            steps {
+                echo 'Запуск тестов с генерацией JUnit XML...'
+                sh '''
+                    . venv/bin/activate
+            	    pip install unittest-xml-reporting
+                    python -m xmlrunner discover -o test-results -v
+                '''
+    }
+            post {
+                success { echo '✅ Все тесты пройдены!' }
+                failure { echo '❌ Тесты упали!' }
+            }
+        }
+
+
+        stage('Publish Test Results') {
+            steps {
+                junit 'test-results/*.xml'
+            }
+        }
+
     }
 
     post {
